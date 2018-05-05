@@ -1,0 +1,10 @@
+#canvas-area {
+    margin: 20px;
+    border: 1px solid black;
+}
+#start {
+    width: 100px;
+    height: 35px;
+    border: none;
+    border-radius: 5px;
+}
