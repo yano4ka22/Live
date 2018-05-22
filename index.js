@@ -11,12 +11,11 @@ class liveGame {
         this.cells = [];
         this.subCells = [];
         this.isStart = false;
+        this.cycleStart = false;
     }
 
     init() {
-        let self = this;
         this.isStart = true;
-        console.log('init this.cells', this.cells);
         this.firstCycle();
         //зачем тут слип?
         //self.sleep(600);
@@ -39,13 +38,12 @@ class liveGame {
     }
 
     start() {
-        console.log('start');
-        this.sleep(600);
+        //this.sleep(600);
         let self = this;
         //Опять получение данных через ретурн
         this.subCells = this.matrixArray(this.step, this.step);
-        //setTimeout(this.goLive, 1000, this.cells, this.subCells, newSelf);
         let count = 0;
+        console.log('self start ',self);
         while (count < 3) {
             //Тебе не надо передавать данные объекта если в том месте есть до них прямой доступ.
             this.cells = this.goLive(self);
@@ -56,7 +54,6 @@ class liveGame {
 
     firstCycle() {
         console.log('firstCycle');
-        // тут есть и self и this почему так?
         this.cells = this.matrixArray(this.step, this.step);
         this.cells[2][2] = 1;
         this.cells[2][3] = 1;
@@ -77,6 +74,7 @@ class liveGame {
                 }
             }
         }
+
     }
 
     sleep(ms) {
@@ -86,22 +84,22 @@ class liveGame {
     }
 
     goLive(newSelf) {
+        let self = this;
         let neighbors;
         // эти 2-а цикла очень похожи, не думаешь?
         //Посмотри что с этим можно сделать.
-        for (let i = 1; i < newSelf.step - 1; i++) {
-            for (let j = 1; j < newSelf.step - 1; j++) {
-                neighbors = newSelf.checkNeighbors(i, j);
-                this.subCells = newSelf.checkLive(this.subCells, neighbors, i, j);
+        for (let i = 1; i < self.step - 1; i++) {
+            for (let j = 1; j < self.step - 1; j++) {
+                neighbors = self.checkNeighbors(i, j);
+                this.subCells = self.checkLive(this.subCells, neighbors, i, j);
             }
         }
-        //методу скорее всего подходит название clearAll чем clearAll
         newSelf.clearAll();
         this.cells = this.subCells;
-        for (let i = 0; i < newSelf.step; i++) {
-            for (let j = 0; j < newSelf.step; j++) {
+        for (let i = 0; i < self.step; i++) {
+            for (let j = 0; j < self.step; j++) {
                 if (this.subCells[i][j] === 1) {
-                    newSelf.addCell(i, j);
+                    self.addCell(i, j);
                 }
             }
         }
@@ -130,14 +128,13 @@ class liveGame {
     }
 
     addCell(x, y) {
-
         //ctxSize = this.canvas.width / this.canvas.width  / 10 ?
         let ctxSize = this.canvas.width / this.step;
 
         this.ctx.strokeRect(x * ctxSize, y * ctxSize, ctxSize, ctxSize);
+
     }
 
-    //методу скорее всего подходит название clearAll чем clearAll
     clearAll() {
         //ctxSize = this.canvas.width / this.canvas.width  / 10 ?
         let ctxSize = this.canvas.width / this.step;
@@ -166,10 +163,9 @@ class liveGame {
 window.onload = function () {
     let live = new liveGame();
     let buttonStart = document.getElementById('start');
-    console.log(buttonStart);
+    live.init();
     buttonStart.addEventListener('click', function () {
-        live.init();
-
+        console.log(live.cycleStart);
         live.start();
 
     });
