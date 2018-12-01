@@ -1,6 +1,10 @@
 #canvas-area {
-    margin: 20px;
-    border: 1px solid black;
+    position: absolute;
+    border: 1px solid #888;
+    z-index: 0;
+}
+#game-area {
+    z-index: 2;
 }
 #start {
     width: 100px;
