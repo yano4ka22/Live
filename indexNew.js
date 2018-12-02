@@ -8,6 +8,7 @@ class liveGame {
         this.step = this.canvas.width / this.sizeCell;
         this.gameSpace = [];
         this.isStart = false;
+        this.timeout = 700
     }
 
     // рисуем сетку
@@ -30,6 +31,7 @@ class liveGame {
         this.gameSpace = this.fillEmptyField(this.sizeCell);
         this.gameSpace[1][1] = true;
         this.gameSpace[1][2] = true;
+        this.gameSpace[1][3] = true;
         this.gameSpace[2][2] = true;
         this.gameSpace[2][3] = true;
         this.gameSpace[3][3] = true;
@@ -38,24 +40,24 @@ class liveGame {
         this.gameSpace[5][4] = true;
         this.gameSpace[6][6] = true;
         this.gameSpace[7][6] = true;
+        this.gameSpace[7][7] = true;
+        this.gameSpace[7][8] = true;
         this.gameSpace[8][6] = true;
         this.gameSpace[7][9] = true;
+        this.gameSpace[8][9] = true;
 
         this.updateDrawing();
 
-        let count = 4;
-        setTimeout(() => {
-            while(count > 0) {
-                this.gameSpace = this.checkNeighbors();
-                this.updateDrawing()
-                /*const timerId = setInterval(() => this.updateDrawing(), 3000);
-                setTimeout(() => {
-                    clearInterval(timerId);
-                }, 5000);
-                count--;*/
-            }
-        }, 1000);
+        let count = 25;
+        const self = this;
 
+        (function myLoop (isStart) {
+            setTimeout(function () {
+                self.gameSpace = self.checkNeighbors();
+                self.updateDrawing();
+                if (isStart) myLoop(count);
+            }, self.timeout)
+        })(this.isStart);
     }
 
     // заполнение массива пустыми ячейками
@@ -88,13 +90,15 @@ class liveGame {
 
     // проверка на соседей
     checkNeighbors() {
-        console.log(this.gameSpace);
         const currentSpace = [];
-        for (let i = 0; i < 9; i++){
+        for (let i = 0; i < this.sizeCell; i++) {
             currentSpace[i] = [];
-            for (let j = 0; j < 9; j++){
+            for (let j = 0; j < this.sizeCell; j++) {
                 currentSpace[i][j] = this.countNeighbors(i, j);
             }}
+
+        if (JSON.stringify(this.gameSpace) === JSON.stringify(currentSpace))
+            this.isStart = false;
 
         return currentSpace;
     }
@@ -103,39 +107,60 @@ class liveGame {
     countNeighbors(i, j) {
         let neighbors = 0;
         if (i === 0) {
-            if (this.gameSpace[i + 1][j] === true) neighbors++;
-            if (this.gameSpace[i + 1][j + 1] === true) neighbors++;
-            if (this.gameSpace[i + 1][j - 1] === true) neighbors++;
-            if (this.gameSpace[i][j - 1] === true) neighbors++;
-            if (this.gameSpace[i][j + 1] === true) neighbors++;
-        } else if (i === this.step-1) {
-            if (this.gameSpace[i - 1][j] === true) neighbors++;
-            if (this.gameSpace[i - 1][j + 1] === true) neighbors++;
-            if (this.gameSpace[i - 1][j - 1] === true) neighbors++;
-            if (this.gameSpace[i][j - 1] === true) neighbors++;
-            if (this.gameSpace[i][j + 1] === true) neighbors++;
-        } else if (j === 0) {
-            console.log(i, j);
-            if (this.gameSpace[i + 1][j] === true) neighbors++;
-            if (this.gameSpace[i + 1][j + 1] === true) neighbors++;
-            if (this.gameSpace[i - 1][j] === true) neighbors++;
-            if (this.gameSpace[i - 1][j + 1] === true) neighbors++;
-            if (this.gameSpace[i][j + 1] === true) neighbors++;
-        } else if (j === this.step-1) {
-            if (this.gameSpace[i + 1][j] === true) neighbors++;
-            if (this.gameSpace[i + 1][j - 1] === true) neighbors++;
-            if (this.gameSpace[i - 1][j] === true) neighbors++;
-            if (this.gameSpace[i - 1][j - 1] === true) neighbors++;
-            if (this.gameSpace[i][j - 1] === true) neighbors++;
+            if (j === 0) {
+                if (this.gameSpace[i + 1][j] === true) neighbors++;
+                if (this.gameSpace[i + 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i][j + 1] === true) neighbors++;
+            } else if (j === this.sizeCell-1) {
+                if (this.gameSpace[i + 1][j] === true) neighbors++;
+                if (this.gameSpace[i + 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j - 1] === true) neighbors++;
+            } else {
+                if (this.gameSpace[i + 1][j] === true) neighbors++;
+                if (this.gameSpace[i + 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i + 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j + 1] === true) neighbors++;
+            }
+        } else if (i === this.sizeCell-1) {
+            if (j === 0) {
+                if (this.gameSpace[i - 1][j] === true) neighbors++;
+                if (this.gameSpace[i - 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i][j + 1] === true) neighbors++;
+            } else if (j === this.sizeCell-1) {
+                if (this.gameSpace[i - 1][j] === true) neighbors++;
+                if (this.gameSpace[i - 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j - 1] === true) neighbors++;
+            } else {
+                if (this.gameSpace[i - 1][j] === true) neighbors++;
+                if (this.gameSpace[i - 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i - 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j + 1] === true) neighbors++;
+            }
         } else {
-            if (this.gameSpace[i + 1][j] === true) neighbors++;
-            if (this.gameSpace[i + 1][j + 1] === true) neighbors++;
-            if (this.gameSpace[i + 1][j - 1] === true) neighbors++;
-            if (this.gameSpace[i - 1][j] === true) neighbors++;
-            if (this.gameSpace[i - 1][j + 1] === true) neighbors++;
-            if (this.gameSpace[i - 1][j - 1] === true) neighbors++;
-            if (this.gameSpace[i][j - 1] === true) neighbors++;
-            if (this.gameSpace[i][j + 1] === true) neighbors++;
+            if (j === 0) {
+                if (this.gameSpace[i + 1][j] === true) neighbors++;
+                if (this.gameSpace[i + 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i - 1][j] === true) neighbors++;
+                if (this.gameSpace[i - 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i][j + 1] === true) neighbors++;
+            } else if (j === this.sizeCell-1) {
+                if (this.gameSpace[i + 1][j] === true) neighbors++;
+                if (this.gameSpace[i + 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i - 1][j] === true) neighbors++;
+                if (this.gameSpace[i - 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j - 1] === true) neighbors++;
+            } else {
+                if (this.gameSpace[i + 1][j] === true) neighbors++;
+                if (this.gameSpace[i + 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i + 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i - 1][j] === true) neighbors++;
+                if (this.gameSpace[i - 1][j + 1] === true) neighbors++;
+                if (this.gameSpace[i - 1][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j - 1] === true) neighbors++;
+                if (this.gameSpace[i][j + 1] === true) neighbors++;
+            }
         }
 
         if (neighbors < 2 || neighbors > 3) return false;
@@ -146,8 +171,8 @@ class liveGame {
     updateDrawing() {
         this.gameArea.clearRect(0, 0, this.canvas.width, this.canvas.width);
 
-        for (let i = 0; i < 9; i += 1) {
-            for (let j = 0; j < 9; j += 1) {
+        for (let i = 0; i < this.sizeCell; i += 1) {
+            for (let j = 0; j < this.sizeCell; j += 1) {
                 if (this.gameSpace[i][j] === true) {
                     this.gameArea.fillRect(i * this.step, j * this.step, this.step + 1, this.step + 1);
                 }
